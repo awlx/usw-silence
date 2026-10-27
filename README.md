@@ -79,6 +79,25 @@ Automatic duty can take a control cycle to update after `auto`.
 The tool exits with status 0 when the request succeeds, 1 for an RPC error,
 or 2 for invalid input. Always check the actual duty with `swctrl env show`.
 
+### Example output
+
+These are illustrative readings, not a recommended temperature or speed.
+Actual values depend on the hardware and load.
+
+```text
+$ /tmp/fanctl check
+switch RPC connection ready; no fan setting changed
+$ /tmp/fanctl 30
+requested 30% duty; verify with swctrl env show
+$ swctrl env show | grep -E 'General Temperature|Fan Duty|FAN-'
+General Temperature (C): 48
+Fan Duty Level: 29
+FAN-1            1800        29          Operational
+FAN-2            1790        29          Operational
+$ /tmp/fanctl auto
+automatic fan control requested; verify with swctrl env show
+```
+
 The executable in `/tmp` is lost on reboot. No boot hook is installed.
 Before removing the tool, run `/tmp/fanctl auto` and confirm automatic control.
 
