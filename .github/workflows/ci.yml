@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends clang lld
+      - name: Test command handling
+        run: python3 -m unittest -v test_fanctl.py
+      - name: Check build script
+        run: sh -n build-fanctl.sh
+      - name: Build ARM executable
+        run: sh build-fanctl.sh
+      - name: Check executable
+        run: |
+          file fanctl
+          readelf -h fanctl | grep -q 'Machine:.*ARM'
+          readelf -l fanctl | grep -F '/lib/ld-uClibc.so.0'
+          for library in libubnt.so.1 libc.so.0 librpcclt.so libz.so.1; do
+            readelf -d fanctl | grep -F "Shared library: [$library]"
+          done
